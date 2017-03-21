@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>日历</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<style>
+		*{margin:0;padding:0;}
+		html,body{font-family: 'Microsoft YaHei';-webkit-text-size-adjust: none;text-size-adjust: none;outline: none}
+		td{text-align: center;cursor: pointer;padding:5px 3px 3px;font-size:8px}
+		tr:nth-child(2n){background-color: #eee;}
+		tr:nth-child(1) td{
+			font-weight: 600;
+			border-bottom:1px solid #aaa;
+		}
+		#title{font-size:16px!important;line-height:25px;margin-top:10px}#myCalendar{width:93%;height:auto;margin:0 auto}#years{width:24%;height:28px}#months{width:18%;height:28px}#sure,#init{width:14%;height:28px}select{text-indent:2%;height:28px;outline:0;border:1px solid #becccb}select option{height:16px;line-height:16px}select:nth-child(1){margin-left:2px}#init,#sure{float:right;margin-right:8px;border-radius:1px;outline:0;border:1px solid #becccb}.dataNum{display:inline-block;height:15px;width:16px;text-align:center;border:1px solid #becccb;border-radius:10px;font:14px/16px '';color:#436d47;margin-bottom:1px;padding-top:1px}.actived{background-color:#383894;color:#fff}.active{background-color:#060650;color:#fff}.active span{color:red}tr td:nth-child(6){color:#de7b7b}tr td:nth-child(7){color:#de7b7b}
+	</style>
+</head>	
+<body onload='changeMonth(true,false,false)'>
+
+<div id='myCalendar'>	<p id='title'></p>	<table id="table_calendar" style='width:100%;border:1px solid #333;' align='center' cellspacing='0'>		<tr align='left'>				<td colspan="7" style="text-align: left;font:500 16px/16px '';padding-left:10px">							<select name="" id="years">					<option value="1">请选择</option>					<option value="2015">2015年</option>					<option value="2016">2016年</option>					<option value="2017">2017年</option>					<option value="2018">2018年</option>					<option value="2019">2019年</option>					<option value="2020">2020年</option>				</select>				年				<select name="" id="months">					<option value="1">请选择</option>					<option value="1">1月</option>					<option value="2">2月</option>					<option value="3">3月</option>					<option value="4">4月</option>					<option value="5">5月</option>					<option value="6">6月</option>					<option value="7">7月</option>					<option value="8">8月</option>					<option value="9">9月</option>					<option value="10">10月</option>					<option value="11">11月</option>					<option value="12" selected='selected'>12月</option>				</select>				月				<button type="" id='init' onclick='changeMonth(true,false,false)'>重置</button>				<button type="" id='sure' onclick='changeMonth(false,true,false)'>确定</button>			</td>		</tr>		<tbody id='tbody' style='width:100%;box-sizing: border-box;padding:15px'>					</tbody>	</table></div>		
+
+<script type="text/javascript"> 
+var doc=document;var sure=_$('#sure');function _$(selector){var selector=new String(selector);if(selector.charAt(0)=='#'){return doc.getElementById(selector.substring(1,selector.length))}else if(selector.charAt(0)=='.'){return doc.getElementsByClass(selector.substring(1,selector.length))[0]}else{throw error('error!')}}function changeMonth(isLoad,isSure,isInit){showCalendar(isLoad,isSure,isInit)};
+function showCalendar(isLoad,isSure,isInit){
+	//trueTime
+		var trueTime= new Date();
+        var trueSY=trueTime.getFullYear(); 
+        var trueSM=trueTime.getMonth(); 
+        var trueSD=trueTime.getDate();
+		var now ={};
+		// 加载过来的时候一个日期！
+		if(isLoad){
+			now = new Date(); 
+			console.log('isLoad..')
+		}else if(isSure){//点击确定时候一个时间
+			now = new Date(_$('#years').value,_$('#months').value-1,1);	
+			console.log('isSure..')	
+		}else if(isInit){//初始化数据的时候
+			now = new Date(); 
+			console.log('isInit..')
+		};
+		//点击日期的时候！
+		_$('#tbody').onclick=function(e){
+			var e=e||window.event;
+			if(e.target.nodeName=='TD'){
+				now= new Date(_$('#years').value,_$('#months').value-1,e.target.children[0].innerHTML);
+				//console.log(now)
+				e.target.className='active actived';
+				setCalendar(e.target.children[0].innerHTML,now);
+			}else if(e.target.nodeName=='SPAN'){
+				e.target.parentNode.className='active actived';
+				now= new Date(_$('#years').value,_$('#months').value-1,e.target.innerHTML);
+				setCalendar(e.target.innerHTML,now);
+			}
+			if(e.cancelBubble){
+	            e.cancelBubble=true;
+	        }else{
+	            e.stopPropagation();
+	        }
+		};
+        var SY = now.getFullYear(); 
+        var SM = now.getMonth(); 
+        var SD = now.getDate(); 
+
+        var lunarInfo = new Array( 
+			0x04bd8, 0x04ae0, 0x0a570, 0x054d5, 0x0d260, 0x0d950, 0x16554, 0x056a0, 0x09ad0, 0x055d2, 
+			0x04ae0, 0x0a5b6, 0x0a4d0, 0x0d250, 0x1d255, 0x0b540, 0x0d6a0, 0x0ada2, 0x095b0, 0x14977, 
+			0x04970, 0x0a4b0, 0x0b4b5, 0x06a50, 0x06d40, 0x1ab54, 0x02b60, 0x09570, 0x052f2, 0x04970, 
+			0x06566, 0x0d4a0, 0x0ea50, 0x06e95, 0x05ad0, 0x02b60, 0x186e3, 0x092e0, 0x1c8d7, 0x0c950, 
+			0x0d4a0, 0x1d8a6, 0x0b550, 0x056a0, 0x1a5b4, 0x025d0, 0x092d0, 0x0d2b2, 0x0a950, 0x0b557, 
+			0x06ca0, 0x0b550, 0x15355, 0x04da0, 0x0a5d0, 0x14573, 0x052d0, 0x0a9a8, 0x0e950, 0x06aa0, 
+			0x0aea6, 0x0ab50, 0x04b60, 0x0aae4, 0x0a570, 0x05260, 0x0f263, 0x0d950, 0x05b57, 0x056a0, 
+			0x096d0, 0x04dd5, 0x04ad0, 0x0a4d0, 0x0d4d4, 0x0d250, 0x0d558, 0x0b540, 0x0b5a0, 0x195a6, 
+			0x095b0, 0x049b0, 0x0a974, 0x0a4b0, 0x0b27a, 0x06a50, 0x06d40, 0x0af46, 0x0ab60, 0x09570, 
+			0x04af5, 0x04970, 0x064b0, 0x074a3, 0x0ea50, 0x06b58, 0x055c0, 0x0ab60, 0x096d5, 0x092e0, 
+			0x0c960, 0x0d954, 0x0d4a0, 0x0da50, 0x07552, 0x056a0, 0x0abb7, 0x025d0, 0x092d0, 0x0cab5, 
+			0x0a950, 0x0b4a0, 0x0baa4, 0x0ad50, 0x055d9, 0x04ba0, 0x0a5b0, 0x15176, 0x052b0, 0x0a930, 
+			0x07954, 0x06aa0, 0x0ad50, 0x05b52, 0x04b60, 0x0a6e6, 0x0a4e0, 0x0d260, 0x0ea65, 0x0d530, 
+			0x05aa0, 0x076a3, 0x096d0, 0x04bd7, 0x04ad0, 0x0a4d0, 0x1d0b6, 0x0d250, 0x0d520, 0x0dd45, 
+			0x0b5a0, 0x056d0, 0x055b2, 0x049b0, 0x0a577, 0x0a4b0, 0x0aa50, 0x1b255, 0x06d20, 0x0ada0) 
+        var Animals = new Array("鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", "鸡", "狗", "猪"); 
+        var Gan = new Array("甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"); 
+        var Zhi = new Array("子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"); 
+
+		// 初始化年/月
+		initDate(isLoad);	
+		function initDate(isLoad){
+			
+			var myYears=_$('#years');
+			var myMonths=_$('#months');
+			
+			if(isLoad){
+				myMonths.children[trueSM+1].setAttribute('selected','selected')	;
+				//初始化年
+				for(var i=0;i<myYears.children.length;i++){	
+					myYears.children[i].removeAttribute('selected');						
+				}
+				for(var j=0;j<myYears.children.length;j++){
+					console.log(myYears.children[j].innerHTML.indexOf(trueSY)>-1)
+					if(myYears.children[j].innerHTML.indexOf(trueSY)>-1){
+						myYears.children[j].setAttribute('selected','selected');
+					}
+				};
+				//初始化月
+				for(var i=0;i<myMonths.children.length;i++){
+					myMonths.children[i].removeAttribute('selected');					
+				};
+				myMonths.children[trueSM+1].setAttribute('selected','selected')	
+			}else{
+					var indexYear=myYears.value-2015;
+					var indexMonth=myMonths.value-1;
+				//初始化年
+				for(var i=0;i<myYears.children.length;i++){		
+						//console.log(myYears.children[i])
+					myYears.children[i].removeAttribute('selected');						
+				};
+					myYears.children[indexYear+1].setAttribute('selected','selected')
+				
+				//初始化月
+				for(var i=0;i<myMonths.children.length;i++){
+					myMonths.children[i].removeAttribute('selected');					
+				};
+					myMonths.children[indexMonth+1].setAttribute('selected','selected')	
+			}
+			
+		
+		};
+
+
+        //==== 传入 offset 传回干支, 0=甲子  
+        function cyclical(num) {return (Gan[num % 10] + Zhi[num % 12]) } ;
+
+        //==== 传回农历 y年的总天数  
+        function lYearDays(y) { 
+            var i, sum = 348 
+            for (i = 0x8000; i > 0x8; i >>= 1) sum += (lunarInfo[y - 1900] & i) ? 1 : 0 
+            return (sum + leapDays(y)) 
+        } ;
+
+        //==== 传回农历 y年闰月的天数  
+        function leapDays(y) { 
+            if (leapMonth(y)) return ((lunarInfo[y - 1900] & 0x10000) ? 30 : 29) 
+            else return (0) 
+        } ;
+
+        //==== 传回农历 y年闰哪个月 1-12 , 没闰传回 0  
+        function leapMonth(y) { return (lunarInfo[y - 1900] & 0xf) } ;
+
+        //====================================== 传回农历 y年m月的总天数  
+        function monthDays(y, m) { return ((lunarInfo[y - 1900] & (0x10000 >> m)) ? 30 : 29) } ;
+
+        //==== 算出农历, 传入日期物件, 传回农历日期物件  
+        //     该物件属性有 .year .month .day .isLeap .yearCyl .dayCyl .monCyl  
+        function Lunar(objDate) { 
+            var i, leap = 0, temp = 0 
+            var baseDate = new Date(1900, 0, 31) 
+            var offset = (objDate - baseDate) / 86400000 
+
+            this.dayCyl = offset + 40 
+            this.monCyl = 14 ;
+
+            for (i = 1900; i < 2050 && offset > 0; i++) { 
+                temp = lYearDays(i) 
+                offset -= temp 
+                this.monCyl += 12 
+            } ;
+            if (offset < 0) { 
+                offset += temp; 
+                i--; 
+                this.monCyl -= 12 
+            } ;
+
+            this.year = i ;
+            this.yearCyl = i - 1864 ;
+
+            leap = leapMonth(i); //闰哪个月  
+            this.isLeap = false;
+
+            for (i = 1; i < 13 && offset > 0; i++) { 
+                //闰月  
+                if (leap > 0 && i == (leap + 1) && this.isLeap == false) 
+                { --i; this.isLeap = true; temp = leapDays(this.year); } 
+                else
+                { temp = monthDays(this.year, i); } 
+
+                //解除闰月  
+                if (this.isLeap == true && i == (leap + 1)) this.isLeap = false
+
+                offset -= temp 
+                if (this.isLeap == false) this.monCyl++ 
+            } ;
+
+            if (offset == 0 && leap > 0 && i == leap + 1) 
+                if (this.isLeap) 
+                { this.isLeap = false; } 
+                else
+                { this.isLeap = true; --i; --this.monCyl; } 
+
+            if (offset < 0) { offset += temp; --i; --this.monCyl; } 
+
+            this.month = i 
+            this.day = offset + 1 
+        } ;
+
+        function YYMMDD(day) { 
+            var cl = '<a STYLE="font-size:14px;color:#0000df">'; 
+            if (now.getDay() == 0) cl = ' '; 
+            if (now.getDay() == 6) cl = ' '; 
+            if((_$('#years').value==trueSY&&_$('#months').value==(trueSM+1))){
+            	//alert(1)
+				return (cl + SY + '年 ' + (SM + 1) + '月 ' + (day?day:SD) + '日</a>'); 
+            }else if((_$('#years').value==trueSY&&_$('#months').value==(trueSM+1) && day!='underfined')){
+            	//alert(2)
+            	return (cl + SY + '年 ' + (SM + 1) + '月 ' + SD + '日</a>'); 
+            }else {
+            	//alert(3)
+            	return (cl + SY + '年 ' + (SM + 1) + '月'+ (day?day:SD) + '日</a>'); 
+            }
+            
+        } ;
+
+        function weekday() { 
+            var day = new Array("星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"); 
+            var cl = '<font color="#000000" STYLE="font-size:14px;">'; 
+            if (now.getDay() == 0) cl = '<font color="#ff0000" STYLE="font-size:14px;">'; 
+            if (now.getDay() == 6) cl = '<font color="#ff0000" STYLE="font-size:14px;">'; 
+            return (cl + day[now.getDay()] + '</font>'); 
+        }; 
+        //==== 中文日期  
+        function cDay(m, d) { 
+            var nStr1 = new Array('日', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'); 
+            var nStr2 = new Array('初', '十', '廿', '卅', '　'); 
+            var s; 
+            //console.log(m,d)
+            if (m > 10) { s = '十' + nStr1[m - 10] } else { s = nStr1[m] } s += '月'
+            switch (d) { 
+                case 10: s += '初十'; break; 
+                case 20: s += '二十'; break; 
+                case 30: s += '三十'; break; 
+                default: s += nStr2[Math.floor(d / 10)]; s += nStr1[d % 10]; 
+            } 
+            return (s); 
+        }; 
+
+function solarDay2(now){var sDObj=now;var lDObj=new Lunar(sDObj);var cl='<font color="#000066" STYLE="font-size:14px;">';var tt=" 农历 "+cDay(lDObj.month,parseInt(lDObj.day));return(cl+tt+" </font>")}function getNowMonthDays(year,month){var isy=false;if(year%400==0||(year%4==0&&year%100!=0)){isy=true}switch(month){case 1:case 3:case 5:case 7:case 8:case 10:case 12:return 31;case 4:case 6:case 9:case 11:return 30;case 2:return isy?28:29}}function getStartWeek(){var tempnum=SD%7;var week=now.getDay()+1;var startweek=week+7-tempnum;return startweek>7?startweek%7:startweek}function getSolarDay(year,month,day){var sDObj=new Date(year,month,day);var lDObj=new Lunar(sDObj);return cDay(lDObj.month,lDObj.day)}function showMonth(){var days=getNowMonthDays(SY,SM+1);var startweek=getStartWeek();var html="<tr><td>星期一</td><td>星期二</td><td>星期三</td><td>星期四</td><td>星期五</td><td>星期六</td><td>星期日</td></tr><tr>";var index=0;console.log(_$("#years").value,_$("#months").value);console.log(trueSY,trueSM);for(var i=1;i<startweek;i++){html+="<td> </td>";index++}for(var i=1;i<=days;i++){if(index%7==0){html+="</tr><tr>"}if(i==trueSD&&_$("#years").value==trueSY&&_$("#months").value==(trueSM+1)){html+="<td><span class='dataNum' style='color:#fff;background-color:red;border:1px solid #f3c'>"+i+"</span><br>"+getSolarDay(SY,SM,i)+"</td>"}else{html+="<td><span class='dataNum'>"+i+"</span><br>"+getSolarDay(SY,SM,i)+"</td>"}index++}for(var i=0;i<7;i++){if(index%7==0){break}html+="<td> </td>";index++}html+="</tr>";_$("#tbody").innerHTML=html}showMonth();function setCalendar(day,now){_$("#title").innerHTML=YYMMDD(day)+" "+weekday()+" "+solarDay2(now)+" "}setCalendar(SD,now);
+
+}
+    </script>
+</body>
+</html>
