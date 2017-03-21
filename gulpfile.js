@@ -1,3 +1,6 @@
+//author:hechaofeng 
+//email:602527818@qq.com
+//date :2017-03-21
 var gulp = require('gulp'), //本地安装gulp所用到的地方
     sass = require('gulp-sass'),
     autoprefixer = require('gulp-autoprefixer'),
